@@ -63,6 +63,14 @@ function patchProductStock(id: number, newStock: number) {
         item.stock = newStock
     }
 }
+async function updateStock(id: number, newStock: number): Promise<void> {
+  const updated = await useFetch<Product>(`https://dummyjson.com/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ stock: newStock }),
+  })
+  patchProductStock(id, updated.stock)
+}
 
 export function useProductsCache() {
     return {
@@ -72,6 +80,7 @@ export function useProductsCache() {
         fetchProducts,
         fetchCategories,
         fetchProductsById,
-        patchProductStock
+        patchProductStock,
+        updateStock
     }
 }
