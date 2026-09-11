@@ -138,6 +138,7 @@ async function refreshAccessToken(): Promise<string> {
 export function useAuth () {
     return {
         accessToken,
+        refreshToken,
         user,
         isAuthenticated,
         login,
