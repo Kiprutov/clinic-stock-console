@@ -1,14 +1,6 @@
 import { ref} from 'vue'
 import { useFetch } from './useFetch'
-
-interface Product {
-    id: number
-    title: string
-    category: string
-    price: number
-    thumbnail: string
-    stock: number
-}
+import type { Product } from '@/types/product'
 
 interface ProductListResponse {
     products: Product[]
@@ -17,6 +9,7 @@ interface ProductListResponse {
     limit: number
 }
 
+export const PRODUCTS_PER_PAGE = 10
 const products = ref<Product[]>([])
 const total = ref(0)
 const categories = ref<string[]>([])
