@@ -17,6 +17,7 @@ interface ProductListResponse {
     limit: number
 }
 
+export const PRODUCTS_PER_PAGE = 10
 const products = ref<Product[]>([])
 const total = ref(0)
 const categories = ref<string[]>([])
