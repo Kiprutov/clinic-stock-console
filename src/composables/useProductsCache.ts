@@ -13,6 +13,7 @@ export const PRODUCTS_PER_PAGE = 10
 const products = ref<Product[]>([])
 const total = ref(0)
 const categories = ref<string[]>([])
+const lastFetchedKey = ref<string | null>(null)
 
 async function fetchProducts(params: {
     limit: number 
@@ -21,6 +22,7 @@ async function fetchProducts(params: {
     order?: 'asc' | 'desc'
     search?: string
     category?: string
+    cacheKey?: string
 }) { 
     const query = new URLSearchParams()
     query.set('limit', String(params.limit))
@@ -43,6 +45,7 @@ async function fetchProducts(params: {
 
     products.value = data.products
     total.value = data.total
+    lastFetchedKey.value = params.cacheKey ?? null
 }
 
 async function fetchCategories() {
@@ -63,15 +66,25 @@ function patchProductStock(id: number, newStock: number) {
         item.stock = newStock
     }
 }
+async function updateStock(id: number, newStock: number): Promise<void> {
+  const updated = await useFetch<Product>(`https://dummyjson.com/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ stock: newStock }),
+  })
+  patchProductStock(id, updated.stock)
+}
 
 export function useProductsCache() {
     return {
         products,
         total,
         categories,
+        lastFetchedKey,
         fetchProducts,
         fetchCategories,
         fetchProductsById,
-        patchProductStock
+        patchProductStock,
+        updateStock
     }
 }

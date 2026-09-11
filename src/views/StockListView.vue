@@ -13,7 +13,7 @@ import EmptyState from '@/components/shared/EmptyState.vue';
 
 const route = useRoute()
 const router = useRouter()
-const { products, total, fetchProducts } = useProductsCache()
+const { products, total, fetchProducts, lastFetchedKey } = useProductsCache()
 
 const isLoading = ref(true)
 const errorMessage =ref<string | null>(null)
@@ -30,6 +30,10 @@ const queryKey = computed(() =>
 )
 
 async function loadProducts() {
+      if (queryKey.value === lastFetchedKey.value) {
+    isLoading.value = false
+    return
+  }
     isLoading.value = true
     errorMessage.value = null
 
@@ -43,6 +47,7 @@ async function loadProducts() {
             order: route.query.order as 'asc' | 'desc' | undefined,
             search: route.query.search as string | undefined,
             category: route.query.category as string | undefined,
+            cacheKey: queryKey.value,
         })
 
         if (products.value.length === 0 && total.value> 0) {
