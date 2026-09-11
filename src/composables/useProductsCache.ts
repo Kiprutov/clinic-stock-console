@@ -1,14 +1,6 @@
 import { ref} from 'vue'
 import { useFetch } from './useFetch'
-
-interface Product {
-    id: number
-    title: string
-    category: string
-    price: number
-    thumbnail: string
-    stock: number
-}
+import type { Product } from '@/types/product'
 
 interface ProductListResponse {
     products: Product[]
