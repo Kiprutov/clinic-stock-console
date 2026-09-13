@@ -83,34 +83,39 @@ onMounted(async () => {
 </script>
 
 <template>
-<div class="mx-auto max-w-5xl px-4 py-6">
-
-    <h1 ref="headingRef" tabindex="-1" class="text-xl font-semibold text-gray-900 focus:outline-none">
+<div class="mx-auto flex max-w-5xl flex-col px-4" style="min-height: 100vh">
+    
+   <div
+  class="sticky top-0 z-10 border-b border-gray-200 bg-gray-50 py-4 md:flex md:items-center md:justify-between md:gap-6"
+>
+      <h1
+        ref="headingRef"
+        tabindex="-1"
+        class="shrink-0 text-xl font-semibold text-gray-900 focus:outline-none"
+      >
         Stock list
-    </h1>
-
-    <div class="mt-4">
+      </h1>
+      <div class="mt-4 md:mt-0 md:flex-1">
         <FiltersBar />
+      </div>
     </div>
 
-    <div class="mt-6">
-        <LoadingState v-if="isLoading" message="Loading stock..."/>
-
-        <ErrorState
-        v-else-if="errorMessage"
-        :message="errorMessage"
-        @retry="loadProducts"/>
-
-        <EmptyState
+    <div class="mt-6 flex-1 pb-6">
+      <LoadingState v-if="isLoading" message="Loading stock…" />
+      <ErrorState v-else-if="errorMessage" :message="errorMessage" @retry="loadProducts" />
+      <EmptyState
         v-else-if="products.length === 0"
-        :message="isFiltered ? 'No items match your search or filters.' : 'No stock items found'"
+        :message="isFiltered ? 'No items match your search or filters.' : 'No stock items found.'"
         :action-label="isFiltered ? 'Clear filters' : undefined"
-        @action="clearFilters" />
-
-        <template v-else>
-            <ProductTable />
-            <Pagination />
-        </template>
+        @action="clearFilters"
+      />
+      <ProductTable v-else />
     </div>
-</div>
+    <div
+      v-if="!isLoading && !errorMessage && products.length > 0"
+      class="sticky bottom-0 border-t border-gray-200 bg-white py-3"
+    >
+      <Pagination />
+    </div>
+  </div>
 </template>

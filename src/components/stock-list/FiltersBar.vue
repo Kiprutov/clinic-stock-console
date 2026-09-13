@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProductsCache } from '@/composables/useProductsCache'
 
@@ -25,11 +25,15 @@ watch(searchInput, (value) => {
 // Re-sync FROM the URL on external changes (back/forward, pasted link).
 watch(
     () => route.query.search,
-    (value) => {
+    async(value) => {
         const stringValue = (value as string) ?? ''
         if (stringValue === searchInput.value) return
         syncingFromRoute = true
         searchInput.value = stringValue
+        await nextTick() // caught from tests and had to add this, without awaiting nextTick, this line ran
+    // before the searchInput watcher fired, so the guard was already
+    // false by the time it mattered and a back/forward nav re-pushed
+    // to the URL instead of staying silent.
         syncingFromRoute = false
     }
 )
@@ -37,7 +41,7 @@ watch(
 const currentSort = computed(() => {
     const sortBy = route.query.sortBy as string | undefined
     const order = route.query.order as string | undefined
-    return sortBy ? `${sortBy}:${order ?? 'asc'}` : ''
+    return sortBy ? `${sortBy}-${order ?? 'asc'}` : ''
 })
 
 function pushQuery(updates: Record<string, string | undefined>) {
@@ -64,7 +68,7 @@ function onSortChange(event: Event) {
         pushQuery({ sortBy: undefined, order: undefined, page: undefined })
         return
     }
-    const [sortBy, order] = value.split(':')
+    const [sortBy, order] = value.split('-')
     pushQuery( { sortBy, order, page: undefined})
 }
 
