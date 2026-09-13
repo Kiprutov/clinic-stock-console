@@ -36,23 +36,47 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-2xl px-4 py-6">
-    <router-link
-      :to="{ name: 'stock-list' }"
-      class="text-sm text-gray-500 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
-    >
-      ← Back to list
-    </router-link>
+  <div class="mx-auto max-w-3xl px-4 pb-10" style="min-height: 100vh">
+    
+    <div class="sticky top-0 z-10 flex items-center gap-2 border-b border-gray-200 bg-gray-50 py-4">
+      <router-link
+        :to="{ name: 'stock-list' }"
+        class="rounded text-sm font-medium text-gray-600 hover:text-gray-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+      >
+        ← Back to list
+      </router-link>
+      <span class="text-gray-300" aria-hidden="true">/</span>
+      <span class="text-sm text-gray-500">Item detail</span>
+    </div>
 
     <LoadingState v-if="isLoading" message="Loading item…" />
     <ErrorState v-else-if="errorMessage" :message="errorMessage" @retry="load" />
 
     <template v-else-if="product">
-      <h1 ref="headingRef" tabindex="-1" class="mt-4 text-xl font-semibold text-gray-900 focus:outline-none">
-        {{ product.title }}
-      </h1>
-      <ProductInfo :product="product" class="mt-4" />
-      <CorrectionForm :product="product" />
+      
+      <div class="mt-6 grid gap-8 md:grid-cols-5">
+        <div class="md:col-span-3">
+          <h1
+            ref="headingRef"
+            tabindex="-1"
+            class="text-xl font-semibold text-gray-900 focus:outline-none"
+          >
+            {{ product.title }}
+          </h1>
+          <div class="mt-4">
+            <ProductInfo :product="product" />
+          </div>
+        </div>
+
+        <div class="md:col-span-2">
+          <h2 class="text-xs font-semibold uppercase tracking-wide text-gray-500">
+            Correct stock
+          </h2>
+          <div class="mt-2">
+            <CorrectionForm :product="product" />
+          </div>
+        </div>
+      </div>
     </template>
   </div>
 </template>
