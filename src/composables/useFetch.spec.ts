@@ -75,7 +75,7 @@ describe('useFetch', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(useFetch('https://example.com/data')).rejects.toThrow(
-      'Network request failed. Check your connection and try again.'
+      'Network request failed. Check your connection and try again.',
     )
   })
 
@@ -167,7 +167,7 @@ describe('useFetch', () => {
     vi.stubGlobal('fetch', fetchMock)
 
     await expect(useFetch('https://example.com/data')).rejects.toThrow(
-      'Session expired. Please login again.'
+      'Session expired. Please login again.',
     )
     expect(isAuthenticated.value).toBe(false)
     expect(accessToken.value).toBeNull()
@@ -180,4 +180,3 @@ describe('useFetch', () => {
     await expect(useFetch('https://example.com/data')).rejects.toThrow('Request failed: 500')
   })
 })
-

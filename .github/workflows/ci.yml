@@ -15,7 +15,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # full history needed for commitlint range
+          fetch-depth: 0 # full history needed for commitlint range
 
       - name: Set up Node 22
         uses: actions/setup-node@v4

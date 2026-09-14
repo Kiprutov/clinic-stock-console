@@ -48,7 +48,7 @@ describe('CorrectionForm', () => {
     updateStockMock.mockReturnValue(
       new Promise<void>((resolve) => {
         resolveSave = resolve
-      })
+      }),
     )
 
     const wrapper = mount(CorrectionForm, { props: { product } })
