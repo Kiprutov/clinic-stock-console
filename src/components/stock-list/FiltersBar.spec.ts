@@ -56,7 +56,7 @@ describe('FiltersBar', () => {
 
     expect(replaceSpy).toHaveBeenCalledTimes(1)
     expect(replaceSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ query: expect.objectContaining({ search: 'bandage' }) })
+      expect.objectContaining({ query: expect.objectContaining({ search: 'bandage' }) }),
     )
   })
 
@@ -79,7 +79,7 @@ describe('FiltersBar', () => {
     const wrapper = mount(FiltersBar, { global: { plugins: [router] } })
 
     await router.replace({ query: { search: 'gauze' } })
-    replaceSpy.mockClear() 
+    replaceSpy.mockClear()
     await wrapper.vm.$nextTick()
 
     const input = wrapper.find('#search').element as HTMLInputElement
@@ -103,16 +103,15 @@ describe('FiltersBar', () => {
     expect(call.query.page).toBeUndefined()
   })
 
-it('splits the sort value into sortBy and order when sort changes', async () => {
-  const router = await createTestRouter()
-  const wrapper = mount(FiltersBar, { global: { plugins: [router] } })
-  const replaceSpy = vi.spyOn(router, 'replace')
+  it('splits the sort value into sortBy and order when sort changes', async () => {
+    const router = await createTestRouter()
+    const wrapper = mount(FiltersBar, { global: { plugins: [router] } })
+    const replaceSpy = vi.spyOn(router, 'replace')
 
-  await wrapper.find('#sort').setValue('price-desc')
+    await wrapper.find('#sort').setValue('price-desc')
 
-  const call = replaceSpy.mock.calls.at(-1)![0] as { query: Record<string, string> }
-  expect(call.query.sortBy).toBe('price')
-  expect(call.query.order).toBe('desc')
+    const call = replaceSpy.mock.calls.at(-1)![0] as { query: Record<string, string> }
+    expect(call.query.sortBy).toBe('price')
+    expect(call.query.order).toBe('desc')
   })
 })
-

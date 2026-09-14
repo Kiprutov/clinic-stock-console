@@ -9,20 +9,24 @@ Built using [DummyJSON](https://dummyjson.com/docs) as the product catalogue. Th
 ## 🚀 Quick Start
 
 ### Prerequisites & Tech Stack
+
 - **Node.js**: `>= 22.18.0` (or `v20+`) & `npm`
 - **Core Tech**: Vue 3, TypeScript, Vite, Tailwind CSS v3, Vitest, ESLint, Prettier
 
 ### Project Setup
+
 ```sh
 npm install
 ```
 
 ### Development Server
+
 ```sh
 npm run dev
 ```
 
 ### Testing, Quality Checks & Build
+
 ```sh
 npm run test:unit    # Run unit tests with Vitest
 npm run type-check   # Type-check Vue & TS files
@@ -44,28 +48,28 @@ I divided the screen into two routes, each having its own shell built around a s
 
 **`/` — Stock list**
 
-| Component | Responsibility |
-|---|---|
-| `FiltersBar` | search · category · sort |
+| Component      | Responsibility                                 |
+| -------------- | ---------------------------------------------- |
+| `FiltersBar`   | search · category · sort                       |
 | `ProductTable` | rows on desktop, stacked cards at tablet width |
-| `Pagination` | page state, synced to the URL |
+| `Pagination`   | page state, synced to the URL                  |
 
 **`/items/:id` — Item detail**
 
-| Component | Responsibility |
-|---|---|
-| `ProductInfo` | name · category · price · thumbnail |
-| `CorrectionForm` | stock count input · save |
+| Component        | Responsibility                      |
+| ---------------- | ----------------------------------- |
+| `ProductInfo`    | name · category · price · thumbnail |
+| `CorrectionForm` | stock count input · save            |
 
 **Shared composables** — used by both routes and shared between them. Each route relies on the shared composables to manage the state.
 
-| Composable | Responsibility |
-|---|---|
-| `useAuth` | token storage, login/logout, refresh mutex |
-| `useProductsCache` | single shared product cache |
-| `useFetch` | AbortController + 401 retry wrapper |
+| Composable         | Responsibility                             |
+| ------------------ | ------------------------------------------ |
+| `useAuth`          | token storage, login/logout, refresh mutex |
+| `useProductsCache` | single shared product cache                |
+| `useFetch`         | AbortController + 401 retry wrapper        |
 
-I designed the stock list to show only what is relevant to a stock decision: thumbnail, title, category, current count. The other information such as brand, price, rating and description stays on the individual product detail page. This is mostly because of the requirement to support 360px-width constraint and to ensure that the stock list fits a tablet screen. 
+I designed the stock list to show only what is relevant to a stock decision: thumbnail, title, category, current count. The other information such as brand, price, rating and description stays on the individual product detail page. This is mostly because of the requirement to support 360px-width constraint and to ensure that the stock list fits a tablet screen.
 
 ### Where state lives
 
@@ -75,7 +79,7 @@ There are three types of state in this app, each with its own place. I kept them
 - **URL state** - search term, category, sort and page are stored directly in the route's query string. They are not copied into component state. This is important because the url is the source of truth. If someone refreshes the page or opens a link shared by colleague they should be able to see the exact same view.
 - **Local UI state** - Here lives the temporary things such as the text being currently typed in the search box or a "saving…" indicator that stays inside the component. This state does not need to survive a refresh and cannot be shared therefore no reason to put it in the URL or shared cache.
 
-These three types of state interact in the search box. while the user is typing, the value is local state and once the user stops typing, it is written to the URL using a debounced `router.replace` rather than `push`. Using `push` would create a browser history entry as we type making the back button frustrating to use. The input box also needs to update when the URL changes from somewhere else like a colleague sharing a link or if the user hits the back button. Keeping this two way sync is important for a good user experience. Otherwise the search box can show one value while the app is actually searching for another. 
+These three types of state interact in the search box. while the user is typing, the value is local state and once the user stops typing, it is written to the URL using a debounced `router.replace` rather than `push`. Using `push` would create a browser history entry as we type making the back button frustrating to use. The input box also needs to update when the URL changes from somewhere else like a colleague sharing a link or if the user hits the back button. Keeping this two way sync is important for a good user experience. Otherwise the search box can show one value while the app is actually searching for another.
 
 ### Fetching, caching, invalidation
 
@@ -98,10 +102,12 @@ The product table uses alternating row stripes based on the position of the rows
 I focused on the accessibility requirements that are actually part of the tasks, such as full keyboard operability and readability at 360px. I skipped full screen reader support with ARIA live regions because it was not a requirement and could be alot of work to implement properly within the timelines given.
 
 **Keyboard:**
+
 - All interactive elements including filters, sorting, save buttons and links work with Tab, Enter and Space keys.
 - Every focusable element has a visible `focus-visible:ring-2` focus indicator.
 
 **Other usability considerations**
+
 - Important states such as "low stock" and "save failed" are shown with text not color alone. This caters for situations of low color vision and judgement.
 - Font sizes use `rem`, and zooming is not restricted.
 - Save and error feedback is communicated through visible text changes rather than color alone.
@@ -114,11 +120,11 @@ I focused on the accessibility requirements that are actually part of the tasks,
 
 **2. `router.replace` for query changes and `router.push` for navigation.**\
 **Rejected:** Using `router.push` for every search, filter or sort change.\
-**Reasons:** Every small change would create a browser history entry, so the back button would move through previous filter states instead of navigating back normally. 
+**Reasons:** Every small change would create a browser history entry, so the back button would move through previous filter states instead of navigating back normally.
 
 **3. App-wide request cancellation with `AbortController`**\
 **Rejected:** Using request sequence numbers and which could lead to ignoring stale responses.\
-**Reasons:** Sequence numbers prevent outdated results from being displayed but they do not stop the old request from running and completing. AbortController cancels the unnecessary work and can be reused across the app. 
+**Reasons:** Sequence numbers prevent outdated results from being displayed but they do not stop the old request from running and completing. AbortController cancels the unnecessary work and can be reused across the app.
 
 **4. Shared product cache patched after updates**\
 **Rejected:** Keeping separate caches per view or invalidating and refetching the list after every stock correction.\
@@ -193,7 +199,7 @@ clinic-stock-console/
 
 ## Section 3 — Deployment & CI/CD
 
-*I will update this section once I complete building plus testing and get it deployed:* public URL, the branch that triggers deployment and which checks (formatter, linter, commitlint, test suite) can block a merge.
+_I will update this section once I complete building plus testing and get it deployed:_ public URL, the branch that triggers deployment and which checks (formatter, linter, commitlint, test suite) can block a merge.
 
 ## Section 4 — AI Reflection
 
@@ -203,19 +209,18 @@ AI was mainly used as a **sounding board for decisions I had already made**. My 
 
 The main design discussion was around a few decisions where I wanted to challenge my initial approach:
 
-* **URL state:** I had already chosen the URL as the source of truth for search, filters, sorting and pagination. I used AI to pressure-test that decision against the requirement for reloads and shared links to preserve the exact view.
-* **Request cancellation:** I evaluated sequence numbering versus `AbortController` for handling rapid filter inputs. I used AI to quickly analyze trade-offs between ignoring stale payload responses versus aborting the already started requests, confirming my decision to implement `AbortController` to eliminate unnecessary network traffic.
-* I used AI to help create the `screen-division.svg` visual that I used to showcase the screen layouts and interactions.
+- **URL state:** I had already chosen the URL as the source of truth for search, filters, sorting and pagination. I used AI to pressure-test that decision against the requirement for reloads and shared links to preserve the exact view.
+- **Request cancellation:** I evaluated sequence numbering versus `AbortController` for handling rapid filter inputs. I used AI to quickly analyze trade-offs between ignoring stale payload responses versus aborting the already started requests, confirming my decision to implement `AbortController` to eliminate unnecessary network traffic.
+- I used AI to help create the `screen-division.svg` visual that I used to showcase the screen layouts and interactions.
 
 AI also helped with **project scaffolding**. I provided the project structure and architectural organization I wanted, then used Antigravity (AI coding assistant) to help set up the corresponding folders, Tailwind configuration and empty route/component stubs.
-
 
 ### What AI / Tooling Got Wrong and How It Was Resolved
 
 A few issues came from the scaffolding and setup:
 
-* **Dependency conflict:** The Vue scaffolding introduced incompatible `oxlint` and `eslint-plugin-oxlint` versions, causing an `npm install` `ERESOLVE` error. I removed those dependencies and kept the existing ESLint and Prettier setup.
-* **Duplicate configuration:** Scaffolding generated additional ESLint and Prettier configuration files where configuration files already existed. I removed the duplicates and kept one configuration for each tool.
-* **File nesting:** VS Code file nesting was enabled by the generated settings, which hid some configuration files. I disabled it so the project structure remained visible and easier to inspect.
+- **Dependency conflict:** The Vue scaffolding introduced incompatible `oxlint` and `eslint-plugin-oxlint` versions, causing an `npm install` `ERESOLVE` error. I removed those dependencies and kept the existing ESLint and Prettier setup.
+- **Duplicate configuration:** Scaffolding generated additional ESLint and Prettier configuration files where configuration files already existed. I removed the duplicates and kept one configuration for each tool.
+- **File nesting:** VS Code file nesting was enabled by the generated settings, which hid some configuration files. I disabled it so the project structure remained visible and easier to inspect.
 
 In each case, I checked what the tooling had generated when running `create-vue` and `npm install`. I identified the issue from the errors shown and I made the corrections before continuing.

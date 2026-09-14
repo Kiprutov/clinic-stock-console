@@ -28,8 +28,13 @@ async function handleSave() {
 </script>
 
 <template>
-  <form class="mt-6 flex flex-col gap-3 rounded-lg border border-gray-200 p-4" @submit.prevent="handleSave">
-    <label for="stock-count" class="block text-sm font-medium text-gray-700">Correct stock count</label>
+  <form
+    class="mt-6 flex flex-col gap-3 rounded-lg border border-gray-200 p-4"
+    @submit.prevent="handleSave"
+  >
+    <label for="stock-count" class="block text-sm font-medium text-gray-700"
+      >Correct stock count</label
+    >
     <div class="flex items-center gap-3">
       <input
         id="stock-count"
@@ -48,7 +53,11 @@ async function handleSave() {
       </button>
     </div>
 
-    <p v-if="savedMessage" role="status" class="text-sm font-medium text-green-700">{{ savedMessage }}</p>
-    <p v-if="errorMessage" role="alert" class="text-sm font-medium text-red-700">{{ errorMessage }}</p>
+    <p v-if="savedMessage" role="status" class="text-sm font-medium text-green-700">
+      {{ savedMessage }}
+    </p>
+    <p v-if="errorMessage" role="alert" class="text-sm font-medium text-red-700">
+      {{ errorMessage }}
+    </p>
   </form>
 </template>

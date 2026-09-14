@@ -7,7 +7,6 @@ import CorrectionForm from '@/components/item-detail/CorrectionForm.vue'
 import LoadingState from '@/components/shared/LoadingState.vue'
 import ErrorState from '@/components/shared/ErrorState.vue'
 
-
 const props = defineProps<{ id: string }>()
 const { fetchProductsById } = useProductsCache()
 
@@ -50,7 +49,6 @@ async function handleShare() {
   resetShareStatusAfterDelay()
 }
 
-
 function resetShareStatusAfterDelay() {
   clearTimeout(shareStatusTimer)
   shareStatusTimer = setTimeout(() => {
@@ -66,8 +64,10 @@ onMounted(async () => {
 </script>
 
 <template>
-   <div class="mx-auto max-w-3xl px-4 pb-10" style="min-height: 100vh">
-    <div class="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-gray-200 bg-gray-50 py-4">
+  <div class="mx-auto max-w-3xl px-4 pb-10" style="min-height: 100vh">
+    <div
+      class="sticky top-0 z-10 flex items-center justify-between gap-2 border-b border-gray-200 bg-gray-50 py-4"
+    >
       <div class="flex items-center gap-2">
         <router-link
           :to="{ name: 'stock-list' }"
@@ -87,7 +87,9 @@ onMounted(async () => {
       >
         <!-- Simple inline share icon — no icon library dependency for one glyph -->
         <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-          <path d="M13 4a2 2 0 1 0-1.94 2.5l-4.12 2.4a2 2 0 1 0 0 2.2l4.12 2.4a2 2 0 1 0 .5-.86l-4.12-2.4a2 2 0 0 0 0-.48l4.12-2.4A2 2 0 0 0 13 4z" />
+          <path
+            d="M13 4a2 2 0 1 0-1.94 2.5l-4.12 2.4a2 2 0 1 0 0 2.2l4.12 2.4a2 2 0 1 0 .5-.86l-4.12-2.4a2 2 0 0 0 0-.48l4.12-2.4A2 2 0 0 0 13 4z"
+          />
         </svg>
         Share
       </button>
@@ -99,7 +101,11 @@ onMounted(async () => {
       class="mt-2 text-right text-sm"
       :class="shareStatus === 'copied' ? 'text-green-700' : 'text-red-700'"
     >
-      {{ shareStatus === 'copied' ? 'Link copied, please paste and share it.' : 'Could not share this link.' }}
+      {{
+        shareStatus === 'copied'
+          ? 'Link copied, please paste and share it.'
+          : 'Could not share this link.'
+      }}
     </p>
 
     <LoadingState v-if="isLoading" message="Loading item…" />
@@ -108,7 +114,11 @@ onMounted(async () => {
     <template v-else-if="product">
       <div class="mt-6 grid gap-8 md:grid-cols-5">
         <div class="md:col-span-3">
-          <h1 ref="headingRef" tabindex="-1" class="text-xl font-semibold text-gray-900 focus:outline-none">
+          <h1
+            ref="headingRef"
+            tabindex="-1"
+            class="text-xl font-semibold text-gray-900 focus:outline-none"
+          >
             {{ product.title }}
           </h1>
           <div class="mt-4">
