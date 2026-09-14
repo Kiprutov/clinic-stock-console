@@ -6,6 +6,10 @@ Built using [DummyJSON](https://dummyjson.com/docs) as the product catalogue. Th
 
 ---
 
+> _**Note from the Author:** This project draws directly from my experience building the Transcend HMIS. The architectural design, state separation and clinical tablet workflows were all driven by past hands-on experience. It made this a great opportunity to re-ignite those memories and build a dependable system. Throughout the task, I prioritized rock-solid functionality and reliable functionalities over complex UI styling._
+
+---
+
 ## 🚀 Quick Start
 
 ### Prerequisites & Tech Stack
