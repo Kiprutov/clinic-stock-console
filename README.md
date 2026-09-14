@@ -1,6 +1,6 @@
 # Clinic Stock Console
 
-An internal console for a clinic’s supplies team to search, filter and update stock counts against the product catalogue. It is designed for use on ward tablets where Wi-Fi can be unreliable, users switch between keyboard and touch. Team members often share links to specific items through chat.
+An internal console for a clinic's supplies team to search, filter and update stock counts against the product catalogue. It is designed for use on ward tablets where Wi-Fi can be unreliable, users switch between keyboard and touch. Team members often share links to specific items through chat.
 
 Built using [DummyJSON](https://dummyjson.com/docs) as the product catalogue. The main focus was on building a practical, reliable workflow.
 
@@ -9,24 +9,20 @@ Built using [DummyJSON](https://dummyjson.com/docs) as the product catalogue. Th
 ## 🚀 Quick Start
 
 ### Prerequisites & Tech Stack
-
 - **Node.js**: `>= 22.18.0` (or `v20+`) & `npm`
 - **Core Tech**: Vue 3, TypeScript, Vite, Tailwind CSS v3, Vitest, ESLint, Prettier
 
 ### Project Setup
-
 ```sh
 npm install
 ```
 
 ### Development Server
-
 ```sh
 npm run dev
 ```
 
 ### Testing, Quality Checks & Build
-
 ```sh
 npm run test:unit    # Run unit tests with Vitest
 npm run type-check   # Type-check Vue & TS files
@@ -48,34 +44,34 @@ I divided the screen into two routes, each having its own shell built around a s
 
 **`/` — Stock list**
 
-| Component      | Responsibility                                 |
-| -------------- | ---------------------------------------------- |
-| `FiltersBar`   | search · category · sort                       |
+| Component | Responsibility |
+|---|---|
+| `FiltersBar` | search · category · sort |
 | `ProductTable` | rows on desktop, stacked cards at tablet width |
-| `Pagination`   | page state, synced to the URL                  |
+| `Pagination` | page state, synced to the URL |
 
 **`/items/:id` — Item detail**
 
-| Component        | Responsibility                      |
-| ---------------- | ----------------------------------- |
-| `ProductInfo`    | name · category · price · thumbnail |
-| `CorrectionForm` | stock count input · save            |
+| Component | Responsibility |
+|---|---|
+| `ProductInfo` | name · category · price · thumbnail |
+| `CorrectionForm` | stock count input · save |
 
 **Shared composables** — used by both routes and shared between them. Each route relies on the shared composables to manage the state.
 
-| Composable         | Responsibility                             |
-| ------------------ | ------------------------------------------ |
-| `useAuth`          | token storage, login/logout, refresh mutex |
-| `useProductsCache` | single shared product cache                |
-| `useFetch`         | AbortController + 401 retry wrapper        |
+| Composable | Responsibility |
+|---|---|
+| `useAuth` | token storage, login/logout, refresh mutex |
+| `useProductsCache` | single shared product cache |
+| `useFetch` | AbortController + 401 retry wrapper |
 
 I designed the stock list to show only what is relevant to a stock decision: thumbnail, title, category, current count. The other information such as brand, price, rating and description stays on the individual product detail page. This is mostly because of the requirement to support 360px-width constraint and to ensure that the stock list fits a tablet screen.
 
 ### Where state lives
 
-There are three types of state in this app, each with its own place. I kept them separate to avoid alot of common issues with state management in larger applications.
+There are three types of state in this app, each with its own place. I kept them separate to avoid a lot of common issues with state management in larger applications.
 
-- **Server state** - products, categories and the logged-in user are handled by `useProductsCache` and `useAuth`. This data comes from an external source ( DummyJSON for now), can become stale and may be needed by mutliple components.
+- **Server state** - products, categories and the logged-in user are handled by `useProductsCache` and `useAuth`. This data comes from an external source ( DummyJSON for now), can become stale and may be needed by multiple components.
 - **URL state** - search term, category, sort and page are stored directly in the route's query string. They are not copied into component state. This is important because the url is the source of truth. If someone refreshes the page or opens a link shared by colleague they should be able to see the exact same view.
 - **Local UI state** - Here lives the temporary things such as the text being currently typed in the search box or a "saving…" indicator that stays inside the component. This state does not need to survive a refresh and cannot be shared therefore no reason to put it in the URL or shared cache.
 
@@ -88,26 +84,24 @@ I avoided Pinia and vue-query and used a few small composables instead. The shar
 All API requests go through a single `useFetch` wrapper. It handles:
 
 - **Request cancellation** - Uses `AbortController` to cancel an older request when a newer one from the same source starts.
-- **Token refresh** - Handles 401 responses in a central point. A shared `refreshPromise` prevents multiple components from trigerring separate refresh requests at the same time. After successful refresh, the original request is retried once. If the refresh token has also expired, the user is logged out instead of entering a retry loop.
+- **Token refresh** - Handles 401 responses in a central point. A shared `refreshPromise` prevents multiple components from triggering separate refresh requests at the same time. After successful refresh, the original request is retried once. If the refresh token has also expired, the user is logged out instead of entering a retry loop.
 
-`useProductsCache` holds the product list as a single shared ref. After a successful stock update, the returned value from the `PUT` response is applied directly to the cache instead of triggering another fetch. This keeps the UI upto date immediately and avoids unnecessary network requests.
+`useProductsCache` holds the product list as a single shared ref. After a successful stock update, the returned value from the `PUT` response is applied directly to the cache instead of triggering another fetch. This keeps the UI up to date immediately and avoids unnecessary network requests.
 
 ### Layout and styling
 
-I used Tailwindcss with utility classes directly than trying to create a custom design token layer. I felt it could be much effort in respect to the timelines given so i kept this implementation simple and fast. If the app grows I would consider introducing a small semantic pallete such as `primary`, `danger` and `surface` to keep colors consitent across components.
+I used Tailwindcss with utility classes directly than trying to create a custom design token layer. I felt it could be much effort in respect to the timelines given so I kept this implementation simple and fast. If the app grows I would consider introducing a small semantic palette such as `primary`, `danger` and `surface` to keep colors consistent across components.
 The product table uses alternating row stripes based on the position of the rows currently being rendered. This is important because filtering and pagination change which rows are visible. If I used old or global index this can result in incorrect striping after the list changes.
 
 ### Accessibility
 
-I focused on the accessibility requirements that are actually part of the tasks, such as full keyboard operability and readability at 360px. I skipped full screen reader support with ARIA live regions because it was not a requirement and could be alot of work to implement properly within the timelines given.
+I focused on the accessibility requirements that are actually part of the tasks, such as full keyboard operability and readability at 360px. I skipped full screen reader support with ARIA live regions because it was not a requirement and could be a lot of work to implement properly within the timelines given.
 
 **Keyboard:**
-
 - All interactive elements including filters, sorting, save buttons and links work with Tab, Enter and Space keys.
 - Every focusable element has a visible `focus-visible:ring-2` focus indicator.
 
 **Other usability considerations**
-
 - Important states such as "low stock" and "save failed" are shown with text not color alone. This caters for situations of low color vision and judgement.
 - Font sizes use `rem`, and zooming is not restricted.
 - Save and error feedback is communicated through visible text changes rather than color alone.
@@ -130,11 +124,25 @@ I focused on the accessibility requirements that are actually part of the tasks,
 **Rejected:** Keeping separate caches per view or invalidating and refetching the list after every stock correction.\
 **Reasons:** A shared cache keeps the list and detail views consistent. Since the 'PUT' response already contains the updated value, patching the cache directly avoids unnecessary network requests and keeps the UI up to date immediately.
 
+**5. Skip refetching on an exact query revisit**\
+**Rejected:** Always refetching the list on mount.\
+**Reasons:** Since DummyJSON doesn't persist `PUT` writes, always refetching meant a correction would silently revert the moment you navigated back to the list. Tracking the last-fetched query and skipping a redundant fetch when it matches fixes that without needing a real backend.
+
+**6. Share button copies to clipboard only, doesn't use the native share sheet**\
+**Rejected:** Using the Web Share API where available, falling back to clipboard copy elsewhere.\
+**Reasons:** I wanted one predictable behaviour on every device rather than the button doing two different things depending on what's available.
+
 ---
 
 ## Section 2 — Build
 
-In this app sign-in gates the app before any stock data loads. The stock list is paginated against `GET /products` and is wired to `FiltersBar` for category/sort/search. Item detail lives at `/items/:id` and the correction form calls `PUT /products/{id}` and on success, it patches `useProductsCache` directly rather than triggering a refetch.
+In this app sign-in gates the app before any stock data loads. The stock list is paginated against `GET /products` and is wired to `FiltersBar` for category/sort/search. Item detail lives at `/items/:id` and the correction form calls `PUT /products/{id}` and on success, it patches `useProductsCache` directly rather than triggering a refetch. Item detail also has a share button that copies the URL to the clipboard, so staff can paste a link to a specific item into chat.
+
+**Token expiry.** Login requests a 1-minute token on purpose, as what the assessment guidelines is testing, so expiry happens during normal use rather than only in theory. When any request gets a 401, `useFetch` refreshes the token silently through a shared in-flight promise so several requests expiring around the same moment don't each trigger their own refresh call, then retries the original request once. The user only sees an interruption if the refresh itself fails (e.g. the refresh token has also expired)  and  in that case a watcher on `isAuthenticated` in `App.vue` redirects to `/login`, preserving the page they were on so they land back there after signing in again.
+
+**Verified against the stated tested requirements.** I went through all five manually against the real app: typing fast with `?delay=2000` never showed stale results, changing category/sort never stranded me on an empty page (and an out-of-range page in the URL self-corrects), reloading and opening a copied URL both restored the exact same search/filter/sort/page, `/http/500` triggered the error state with a working retry and the whole flow is usable keyboard-only and readable at 360px.
+
+There are 19 real tests across three files : `useFetch.spec.ts` (the refresh mutex, request cancellation, retry cap, forced logout on refresh failure), `FiltersBar.spec.ts` (URL sync, debounce, the route-sync guard flag), and `CorrectionForm.spec.ts` (the save flow and error handling). No placeholder tests. I deliberately broke the code a couple of times while building these to confirm the tests actually fail when they should, not just pass by coincidence or luck.
 
 ### Project structure
 
@@ -144,7 +152,7 @@ Components are grouped by which route owns them, not by generic type. `FiltersBa
 clinic-stock-console/
 ├── .github/
 │   └── workflows/
-│       └── ci.yml                    # format · lint · commitlint · test → deploy on push / merge to main
+│       └── ci.yml                    # format · lint · commitlint · test-check on every PR
 ├── .husky/
 │   └── commit-msg                    # commitlint hook, runs locally
 ├── public/
@@ -180,6 +188,8 @@ clinic-stock-console/
 │   │   └── useFetch.spec.ts          # refresh-mutex + search-race-condition tests
 │   ├── types/
 │   │   └── product.ts
+│   ├── utils/
+│   │   └── lowStock.ts               # pulled this out once ProductTable and ProductCard both needed it
 │   └── assets/
 │       ├── main.css                  # Tailwind entry
 │       └── screen-division.svg       # layout & state architecture diagram
@@ -190,37 +200,54 @@ clinic-stock-console/
 ├── tailwind.config.ts
 ├── tsconfig.json
 ├── vite.config.ts
+├── wrangler.jsonc                    # tells Cloudflare this is static assets, not a Worker script
 ├── index.html
 ├── package.json
 └── README.md
 ```
 
-**API limitation to verify and document once building starts:** whether `PUT /products/{id}` persists the change server-side or simply echoes a fake success — this determines whether the optimistic UI on save is representing real backend state or purely local state, and should be called out explicitly either way.
+**A real limitation I hit while building:** DummyJSON's `PUT /products/{id}` does not actually persist the write server-side, it just echoes back what you sent. I confirmed this both against their docs and by watching it happen. I would save a correction, navigate back to the list, and it would revert. To work around it, the stock list now skips refetching if it's revisiting the exact same search/filter/sort/page it already has cached, so a correction survives normal navigation within a session. A hard reload still goes back to the seed data, since there is genuinely nothing else I can do about that without a real backend.
 
 ## Section 3 — Deployment & CI/CD
 
-_I will update this section once I complete building plus testing and get it deployed:_ public URL, the branch that triggers deployment and which checks (formatter, linter, commitlint, test suite) can block a merge.
+**Live URL:** https://clinic-stock-console.kiprutovictor.workers.dev
+
+Deployed on Cloudflare Workers (their newer unified platform, static assets mode and not classic Pages, which is what I originally set out to use before finding out Cloudflare's moved on from it). Deployment is fully owned by Cloudflare's own git integration: push to `main` deploys to production and every branch/PR gets its own preview URL automatically. I deliberately kept this separate from GitHub Actions rather than having CI also try to deploy. I did not want two different things both thinking they are in charge of shipping the app.
+
+GitHub Actions (`.github/workflows/ci.yml`) is purely a quality gate on `main` and every PR: format check, lint, commitlint, type-check and the test suite, in that order. Any failure blocks the PR. `wrangler.jsonc` at the repo root is what tells Cloudflare to serve `dist/` as static assets with SPA fallback routing (`not_found_handling: single-page-application`) and without it, refreshing on `/items/:id` directly would result in a 404.
+
+**Note on GitHub Actions:** CI could not run on this account due to a billing/payment-method restriction outside my control (GitHub requires a physical card; I only have access to prepaid cards). The workflow itself is complete and correctly configured with format, lint, commitlint, type-check and the test suite. All checks pass cleanly when run locally with the exact same commands the workflow uses (`npm run format:check`, `npm run lint:check`, `npm run type-check`, `npm run test`). Deployment is unaffected, since it is handled entirely by Cloudflare's own git integration, not GitHub Actions so production deploys correctly on every push to `main`.
 
 ## Section 4 — AI Reflection
 
-### How AI Was Used in This Project
+**1. What I used AI for**
 
-AI was mainly used as a **sounding board for decisions I had already made**. My understanding of the architecture came from my previous experience building an HMIS, and this project followed many of the same patterns on a smaller scale.
+For design I wrote my own first version of the architecture before bringing AI in, as I had my experience with building Transcend Eye Hospital HMIS and I had a pretty good idea of what I wanted to do. Things like URL as the source of truth, the three way state split, staying away from Pinia and vue query. I used AI mostly to pressure test those choices, asking about edge cases like back button behaviour or several requests expiring at the same time. The screen division diagram was also generated from a structure I described to it.
 
-The main design discussion was around a few decisions where I wanted to challenge my initial approach:
+For the build I wrote most of the code myself with autocomplete helping along the way. I would start writing a few words or lines of code and auto-complete feature was helpful in code completions and adjusted it as I went. Tests were built the same way. I decided what was worth testing and worked through the assertions, then ran them myself to make sure they actually caught real bugs.
 
-- **URL state:** I had already chosen the URL as the source of truth for search, filters, sorting and pagination. I used AI to pressure-test that decision against the requirement for reloads and shared links to preserve the exact view.
-- **Request cancellation:** I evaluated sequence numbering versus `AbortController` for handling rapid filter inputs. I used AI to quickly analyze trade-offs between ignoring stale payload responses versus aborting the already started requests, confirming my decision to implement `AbortController` to eliminate unnecessary network traffic.
-- I used AI to help create the `screen-division.svg` visual that I used to showcase the screen layouts and interactions.
+For deployment I leaned on AI to guide me. Cloudflare hadn't changed mid build, they had already moved to a newer way of setting things up and I just wasn't sure how it worked yet, so I used AI to help me align with their current setup and work through the wrangler config and a couple of real deploy errors.
 
-AI also helped with **project scaffolding**. I provided the project structure and architectural organization I wanted, then used Antigravity (AI coding assistant) to help set up the corresponding folders, Tailwind configuration and empty route/component stubs.
+This reflection is written by me, not generated.
 
-### What AI / Tooling Got Wrong and How It Was Resolved
+**2. Tools and workflow**
 
-A few issues came from the scaffolding and setup:
+No spec driven framework, nothing like Superpowers or GSD or Spec Kit. I used Claude for discussion and for building out tests. I used Antigravity IDE for the initial project scaffolding. I structured the work myself, one branch per feature, one pull request per branch, discuss then build then commit for each file.
 
-- **Dependency conflict:** The Vue scaffolding introduced incompatible `oxlint` and `eslint-plugin-oxlint` versions, causing an `npm install` `ERESOLVE` error. I removed those dependencies and kept the existing ESLint and Prettier setup.
-- **Duplicate configuration:** Scaffolding generated additional ESLint and Prettier configuration files where configuration files already existed. I removed the duplicates and kept one configuration for each tool.
-- **File nesting:** VS Code file nesting was enabled by the generated settings, which hid some configuration files. I disabled it so the project structure remained visible and easier to inspect.
+**3. Where AI genuinely improved my work**
 
-In each case, I checked what the tooling had generated when running `create-vue` and `npm install`. I identified the issue from the errors shown and I made the corrections before continuing.
+The token refresh mutex in `useAuth.ts`. I knew I needed to refresh the token on a 401 but hadn't thought through what happens when several requests expire around the same moment, which is a real case given the assessment 1 minute token. I asked for the tradeoffs between each request refreshing on its own versus sharing one in flight refresh. Seeing it laid out made the problem obvious in a way it had not been before and the shared promise pattern is what is in the code.
+
+**4. Where AI output was wrong and how I caught it**
+
+Most of the wrong output came from the initial scaffolding. Antigravity set up dependencies that conflicted, `oxlint` and `eslint-plugin-oxlint` versions that did not work together and caused an ERESOLVE error on `npm install`. It also generated duplicate ESLint and Prettier config files where I already had my own. I caught these by reading the actual errors in the terminal rather than assuming the scaffold was correct, removed the conflicting packages and the duplicate configs and kept one setup for each tool.
+
+**5. Decisions I made without AI**
+
+Writing the actual code was mine. AI helped discuss and generate pieces but typing and shaping the implementation by hand with autocomplete was my own work throughout. The folder structure was also my own decision, I decided how to group components by route and where composables should live before any of it was scaffolded.
+
+**6. Where I would struggle to defend part of my codebase**
+
+The GitHub Actions workflow file. I wrote and configured it but the billing restriction on my account meant I did not get to watch it actually run end to end on GitHub, only confirmed locally that each command it calls passes on its own.
+
+Also parts of the Cloudflare setup, `wrangler.jsonc` specifically. Cloudflare had changed the way projects get set up since I last used it, so some of the fields and commands in there came from working through their current docs with AI rather than from things I already knew well.
