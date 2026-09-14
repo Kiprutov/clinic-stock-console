@@ -1,6 +1,7 @@
 <script setup lang="ts">
 interface Props {
   message?: string
+  // eslint-disable-next-line vue/require-default-prop -- undefined means "no action to show"
   actionLabel?: string
 }
 
